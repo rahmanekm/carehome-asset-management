@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Add Maintenance - {{ equipment.name }} - Care Home Equipment Management{% endblock %}
+
+{% block header %}Add Maintenance Record{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">{{ equipment.name }}</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('equipment.add_maintenance', id=equipment.id) }}">
+                    <div class="mb-3">
+                        <label for="maintenance_date" class="form-label">Maintenance Date</label>
+                        <input type="date" class="form-control" id="maintenance_date" name="maintenance_date" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="maintenance_type" class="form-label">Maintenance Type</label>
+                        <select class="form-select" id="maintenance_type" name="maintenance_type" required>
+                            <option value="routine">Routine Maintenance</option>
+                            <option value="repair">Repair</option>
+                            <option value="inspection">Inspection</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="performed_by" class="form-label">Performed By</label>
+                        <input type="text" class="form-control" id="performed_by" name="performed_by" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="cost" class="form-label">Cost (£)</label>
+                        <input type="number" class="form-control" id="cost" name="cost" step="0.01" min="0">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="next_maintenance_date" class="form-label">Next Maintenance Date</label>
+                        <input type="date" class="form-control" id="next_maintenance_date" name="next_maintenance_date">
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Add Maintenance Record</button>
+                        <a href="{{ url_for('equipment.equipment_detail', id=equipment.id) }}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,413 @@
+{% extends "base.html" %}
+
+{% block title %}F2 CareHome - Dashboard{% endblock %}
+
+{% block styles %}
+<style>
+    .dashboard-header {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 2rem 0;
+        margin: -20px -12px 20px -12px;
+        border-radius: 0 0 15px 15px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .dashboard-title {
+        font-size: 2rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .dashboard-subtitle {
+        font-size: 1rem;
+        opacity: 0.9;
+    }
+
+    .stats-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        padding: 1.5rem;
+        transition: transform 0.3s, box-shadow 0.3s;
+        height: 100%;
+    }
+
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+
+    .stats-icon {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        color: var(--secondary-color);
+    }
+
+    .stats-number {
+        font-size: 2.5rem;
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+    }
+
+    .stats-label {
+        color: #6c757d;
+        font-size: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .search-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+
+    .search-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .search-form .form-control,
+    .search-form .form-select {
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        border: 1px solid #e0e0e0;
+        transition: all 0.3s;
+    }
+
+    .search-form .form-control:focus,
+    .search-form .form-select:focus {
+        border-color: var(--secondary-color);
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    }
+
+    .search-form .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 500;
+    }
+
+    .table-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+
+    .table-card .card-header {
+        background: transparent;
+        border-bottom: 1px solid rgba(0,0,0,0.1);
+        padding: 1.5rem;
+    }
+
+    .table-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .table thead th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+
+    .maintenance-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-weight: 500;
+        font-size: 0.85rem;
+    }
+
+    .chart-container {
+        position: relative;
+        margin: 20px 0;
+        height: 300px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Dashboard Header -->
+<div class="dashboard-header">
+    <div class="container">
+        <h1 class="dashboard-title">Welcome to F2 CareHome Dashboard</h1>
+        <p class="dashboard-subtitle">Monitor and manage your equipment efficiently</p>
+    </div>
+</div>
+
+<!-- Stats Overview -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="stats-card text-center">
+            <div class="stats-icon">
+                <i class="bi bi-boxes"></i>
+            </div>
+            <div class="stats-number">{{ equipment_count }}</div>
+            <div class="stats-label">Total Equipment</div>
+            <a href="{{ url_for('equipment.equipment_list') }}" class="btn btn-outline-primary rounded-pill">
+                View All <i class="bi bi-arrow-right ms-2"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="stats-card text-center">
+            <div class="stats-icon">
+                <i class="bi bi-tools text-warning"></i>
+            </div>
+            <div class="stats-number text-warning">{{ maintenance_needed }}</div>
+            <div class="stats-label">Maintenance Required</div>
+            <a href="{{ url_for('equipment.equipment_list', status='maintenance') }}" class="btn btn-outline-warning rounded-pill">
+                View Maintenance <i class="bi bi-arrow-right ms-2"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="stats-card text-center">
+            <div class="stats-icon">
+                <i class="bi bi-exclamation-triangle text-danger"></i>
+            </div>
+            <div class="stats-number text-danger">{{ out_of_service }}</div>
+            <div class="stats-label">Out of Service</div>
+            <a href="{{ url_for('equipment.equipment_list', status='out_of_service') }}" class="btn btn-outline-danger rounded-pill">
+                View Out of Service <i class="bi bi-arrow-right ms-2"></i>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Search Section -->
+<div class="search-card">
+    <div class="card-body">
+        <form method="GET" class="search-form row g-3">
+            <div class="col-md-3">
+                <div class="input-group">
+                    <span class="input-group-text bg-transparent border-end-0">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" class="form-control border-start-0" name="search" placeholder="Search equipment..." value="{{ search_query }}">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <select class="form-select" name="category">
+                    <option value="">All Categories</option>
+                    {% for category in categories.keys() %}
+                    <option value="{{ category }}" {% if search_category == category %}selected{% endif %}>{{ category }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select class="form-select" name="location">
+                    <option value="">All Locations</option>
+                    {% for location in locations %}
+                    <option value="{{ location }}" {% if search_location == location %}selected{% endif %}>{{ location }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select class="form-select" name="status">
+                    <option value="">All Status</option>
+                    <option value="operational" {% if search_status == 'operational' %}selected{% endif %}>Operational</option>
+                    <option value="maintenance" {% if search_status == 'maintenance' %}selected{% endif %}>Maintenance</option>
+                    <option value="out_of_service" {% if search_status == 'out_of_service' %}selected{% endif %}>Out of Service</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary me-2">
+                    <i class="bi bi-search me-2"></i>Search
+                </button>
+                <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-x-circle me-2"></i>Clear
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Search Results -->
+{% if search_query or search_category or search_location or search_status %}
+<div class="table-card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">Search Results</h5>
+        <span class="badge bg-primary">{{ filtered_equipment|length }} items found</span>
+    </div>
+    <div class="card-body">
+        {% if filtered_equipment %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>NAME</th>
+                        <th>CATEGORY</th>
+                        <th>LOCATION</th>
+                        <th>STATUS</th>
+                        <th>SERIAL NUMBER</th>
+                        <th>ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for equipment in filtered_equipment %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-box me-2"></i>
+                                <span>{{ equipment.name }}</span>
+                            </div>
+                        </td>
+                        <td>{{ equipment.category }}</td>
+                        <td>
+                            <i class="bi bi-geo-alt me-1"></i>{{ equipment.location }}
+                        </td>
+                        <td>
+                            <span class="maintenance-badge {% if equipment.status == 'operational' %}bg-success{% elif equipment.status == 'maintenance' %}bg-warning{% else %}bg-danger{% endif %}">
+                                <i class="bi {% if equipment.status == 'operational' %}bi-check-circle{% elif equipment.status == 'maintenance' %}bi-tools{% else %}bi-x-circle{% endif %} me-1"></i>
+                                {{ equipment.status|replace('_', ' ')|title }}
+                            </span>
+                        </td>
+                        <td>
+                            <code>{{ equipment.serial_number }}</code>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('equipment.equipment_detail', id=equipment.id) }}" class="btn btn-sm btn-outline-primary rounded-pill">
+                                <i class="bi bi-eye me-1"></i>View Details
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+            <i class="bi bi-search text-muted" style="font-size: 3rem;"></i>
+            <p class="text-muted mt-3">No equipment found matching your search criteria.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<div class="row g-4">
+    <!-- Equipment by Category -->
+    <div class="col-md-6">
+        <div class="table-card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-diagram-3 me-2"></i>Equipment by Category
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>CATEGORY</th>
+                                <th class="text-center">COUNT</th>
+                                <th class="text-end">ACTION</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for category, count in equipment_by_category.items() %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-folder me-2"></i>
+                                        {{ category }}
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-primary rounded-pill">{{ count }}</span>
+                                </td>
+                                <td class="text-end">
+                                    <a href="{{ url_for('equipment.equipment_list', category=category) }}" class="btn btn-sm btn-outline-primary rounded-pill">
+                                        <i class="bi bi-eye me-1"></i>View
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Maintenance -->
+    <div class="col-md-6">
+        <div class="table-card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-clock-history me-2"></i>Recent Maintenance
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if recent_maintenance %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>EQUIPMENT</th>
+                                <th>DATE</th>
+                                <th>TYPE</th>
+                                <th>BY</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for maintenance in recent_maintenance %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-tools me-2"></i>
+                                        {{ maintenance.equipment.name }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <i class="bi bi-calendar me-1"></i>
+                                    {{ maintenance.maintenance_date.strftime('%Y-%m-%d') }}
+                                </td>
+                                <td>
+                                    <span class="badge bg-info rounded-pill">
+                                        {{ maintenance.maintenance_type|title }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <i class="bi bi-person me-1"></i>
+                                    {{ maintenance.performed_by }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="bi bi-clipboard-check text-muted" style="font-size: 3rem;"></i>
+                    <p class="text-muted mt-3">No recent maintenance records.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Add any additional JavaScript for interactivity here
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add smooth scrolling to all links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    });
+</script>
+{% endblock %} 

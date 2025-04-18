@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Equipment List - Care Home Equipment Management{% endblock %}
+
+{% block header %}Equipment List{% endblock %}
+
+{% block actions %}
+<div class="btn-group me-2">
+    <a href="{{ url_for('equipment.add_equipment') }}" class="btn btn-sm btn-outline-primary">
+        <i class="bi bi-plus"></i> Add Equipment
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-3">
+    <div class="col-md-6">
+        <form class="row g-3">
+            <div class="col-md-6">
+                <select class="form-select" name="category" onchange="this.form.submit()">
+                    <option value="all" {% if current_category == 'all' %}selected{% endif %}>All Categories</option>
+                    {% for category in categories.keys() %}
+                    <option value="{{ category }}" {% if current_category == category %}selected{% endif %}>{{ category }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6">
+                <select class="form-select" name="status" onchange="this.form.submit()">
+                    <option value="all" {% if current_status == 'all' %}selected{% endif %}>All Status</option>
+                    <option value="operational" {% if current_status == 'operational' %}selected{% endif %}>Operational</option>
+                    <option value="maintenance" {% if current_status == 'maintenance' %}selected{% endif %}>Maintenance</option>
+                    <option value="out_of_service" {% if current_status == 'out_of_service' %}selected{% endif %}>Out of Service</option>
+                </select>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Subcategory</th>
+                <th>Serial Number</th>
+                <th>Location</th>
+                <th>Status</th>
+                <th>Last Maintenance</th>
+                <th>Next Maintenance</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in equipment %}
+            <tr>
+                <td>{{ item.name }}</td>
+                <td>{{ item.category }}</td>
+                <td>{{ item.subcategory }}</td>
+                <td>{{ item.serial_number }}</td>
+                <td>{{ item.location }}</td>
+                <td>
+                    <span class="badge {% if item.status == 'operational' %}bg-success{% elif item.status == 'maintenance' %}bg-warning{% else %}bg-danger{% endif %}">
+                        {{ item.status|replace('_', ' ')|title }}
+                    </span>
+                </td>
+                <td>{{ item.last_maintenance.strftime('%Y-%m-%d') if item.last_maintenance else 'Never' }}</td>
+                <td>{{ item.next_maintenance.strftime('%Y-%m-%d') if item.next_maintenance else 'Not scheduled' }}</td>
+                <td>
+                    <div class="btn-group">
+                        <a href="{{ url_for('equipment.equipment_detail', id=item.id) }}" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="{{ url_for('equipment.edit_equipment', id=item.id) }}" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="{{ url_for('equipment.add_maintenance', id=item.id) }}" class="btn btn-sm btn-outline-info">
+                            <i class="bi bi-tools"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %} 

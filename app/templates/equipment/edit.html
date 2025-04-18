@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Equipment - {{ equipment.name }} - Care Home Equipment Management{% endblock %}
+
+{% block header %}Edit Equipment{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('equipment.edit_equipment', id=equipment.id) }}">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Equipment Name</label>
+                        <input type="text" class="form-control" id="name" name="name" value="{{ equipment.name }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="category" class="form-label">Category</label>
+                        <select class="form-select" id="category" name="category" required>
+                            <option value="">Select a category</option>
+                            {% for category in categories.keys() %}
+                            <option value="{{ category }}" {% if equipment.category == category %}selected{% endif %}>{{ category }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="subcategory" class="form-label">Subcategory</label>
+                        <select class="form-select" id="subcategory" name="subcategory" required>
+                            <option value="">Select a subcategory</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="serial_number" class="form-label">Serial Number</label>
+                        <input type="text" class="form-control" id="serial_number" name="serial_number" value="{{ equipment.serial_number }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="purchase_date" class="form-label">Purchase Date</label>
+                        <input type="date" class="form-control" id="purchase_date" name="purchase_date" value="{{ equipment.purchase_date.strftime('%Y-%m-%d') }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="location" class="form-label">Location</label>
+                        <input type="text" class="form-control" id="location" name="location" value="{{ equipment.location }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Status</label>
+                        <select class="form-select" id="status" name="status" required>
+                            <option value="operational" {% if equipment.status == 'operational' %}selected{% endif %}>Operational</option>
+                            <option value="maintenance" {% if equipment.status == 'maintenance' %}selected{% endif %}>Maintenance</option>
+                            <option value="out_of_service" {% if equipment.status == 'out_of_service' %}selected{% endif %}>Out of Service</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Notes</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="3">{{ equipment.notes }}</textarea>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Update Equipment</button>
+                        <a href="{{ url_for('equipment.equipment_detail', id=equipment.id) }}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('category').addEventListener('change', function() {
+    const category = this.value;
+    const subcategorySelect = document.getElementById('subcategory');
+    subcategorySelect.innerHTML = '<option value="">Select a subcategory</option>';
+    
+    if (category) {
+        const subcategories = {{ categories|tojson }};
+        subcategories[category].forEach(function(subcategory) {
+            const option = document.createElement('option');
+            option.value = subcategory;
+            option.textContent = subcategory;
+            if (subcategory === '{{ equipment.subcategory }}') {
+                option.selected = true;
+            }
+            subcategorySelect.appendChild(option);
+        });
+    }
+});
+
+// Initialize subcategory on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const categorySelect = document.getElementById('category');
+    categorySelect.dispatchEvent(new Event('change'));
+});
+</script>
+{% endblock %} 

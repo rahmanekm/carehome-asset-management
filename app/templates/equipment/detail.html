@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}{{ equipment.name }} - Care Home Equipment Management{% endblock %}
+
+{% block header %}{{ equipment.name }}{% endblock %}
+
+{% block actions %}
+<div class="btn-group me-2">
+    <a href="{{ url_for('equipment.edit_equipment', id=equipment.id) }}" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-pencil"></i> Edit
+    </a>
+    <a href="{{ url_for('equipment.add_maintenance', id=equipment.id) }}" class="btn btn-sm btn-outline-info">
+        <i class="bi bi-tools"></i> Add Maintenance
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Equipment Details</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">Category</dt>
+                    <dd class="col-sm-8">{{ equipment.category }}</dd>
+
+                    <dt class="col-sm-4">Subcategory</dt>
+                    <dd class="col-sm-8">{{ equipment.subcategory }}</dd>
+
+                    <dt class="col-sm-4">Serial Number</dt>
+                    <dd class="col-sm-8">{{ equipment.serial_number }}</dd>
+
+                    <dt class="col-sm-4">Purchase Date</dt>
+                    <dd class="col-sm-8">{{ equipment.purchase_date.strftime('%Y-%m-%d') }}</dd>
+
+                    <dt class="col-sm-4">Location</dt>
+                    <dd class="col-sm-8">{{ equipment.location }}</dd>
+
+                    <dt class="col-sm-4">Status</dt>
+                    <dd class="col-sm-8">
+                        <span class="badge {% if equipment.status == 'operational' %}bg-success{% elif equipment.status == 'maintenance' %}bg-warning{% else %}bg-danger{% endif %}">
+                            {{ equipment.status|replace('_', ' ')|title }}
+                        </span>
+                    </dd>
+
+                    <dt class="col-sm-4">Last Maintenance</dt>
+                    <dd class="col-sm-8">{{ equipment.last_maintenance.strftime('%Y-%m-%d') if equipment.last_maintenance else 'Never' }}</dd>
+
+                    <dt class="col-sm-4">Next Maintenance</dt>
+                    <dd class="col-sm-8">{{ equipment.next_maintenance.strftime('%Y-%m-%d') if equipment.next_maintenance else 'Not scheduled' }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Maintenance History</h5>
+            </div>
+            <div class="card-body">
+                {% if equipment.maintenance_records %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Performed By</th>
+                                <th>Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in equipment.maintenance_records %}
+                            <tr>
+                                <td>{{ record.maintenance_date.strftime('%Y-%m-%d') }}</td>
+                                <td>{{ record.maintenance_type|title }}</td>
+                                <td>{{ record.performed_by }}</td>
+                                <td>£{{ "%.2f"|format(record.cost) if record.cost else 'N/A' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No maintenance records found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if equipment.notes %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Notes</h5>
+            </div>
+            <div class="card-body">
+                {{ equipment.notes|nl2br }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %} 

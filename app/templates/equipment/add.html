@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Add Equipment - Care Home Equipment Management{% endblock %}
+
+{% block header %}Add New Equipment{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('equipment.add_equipment') }}">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Equipment Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="category" class="form-label">Category</label>
+                        <select class="form-select" id="category" name="category" required>
+                            <option value="">Select a category</option>
+                            {% for category in categories.keys() %}
+                            <option value="{{ category }}">{{ category }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="subcategory" class="form-label">Subcategory</label>
+                        <select class="form-select" id="subcategory" name="subcategory" required>
+                            <option value="">Select a subcategory</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="serial_number" class="form-label">Serial Number</label>
+                        <input type="text" class="form-control" id="serial_number" name="serial_number" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="purchase_date" class="form-label">Purchase Date</label>
+                        <input type="date" class="form-control" id="purchase_date" name="purchase_date" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="location" class="form-label">Location</label>
+                        <input type="text" class="form-control" id="location" name="location" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Notes</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Add Equipment</button>
+                        <a href="{{ url_for('equipment.equipment_list') }}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('category').addEventListener('change', function() {
+    const category = this.value;
+    const subcategorySelect = document.getElementById('subcategory');
+    subcategorySelect.innerHTML = '<option value="">Select a subcategory</option>';
+    
+    if (category) {
+        const subcategories = {{ categories|tojson }};
+        subcategories[category].forEach(function(subcategory) {
+            const option = document.createElement('option');
+            option.value = subcategory;
+            option.textContent = subcategory;
+            subcategorySelect.appendChild(option);
+        });
+    }
+});
+</script>
+{% endblock %} 
