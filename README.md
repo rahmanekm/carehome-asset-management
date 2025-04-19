@@ -8,6 +8,7 @@ A comprehensive web application for managing equipment and assets in UK-based ca
 - [Security Considerations](#security-considerations)
 - [Installation Guide](#installation-guide)
 - [Database Setup](#database-setup)
+- [Sample Data](#sample-data)
 - [Web Server Configuration](#web-server-configuration)
 - [SSL/TLS Setup](#ssltls-setup)
 - [Monitoring Setup](#monitoring-setup)
@@ -161,9 +162,43 @@ FLUSH PRIVILEGES;
 ### 2. Database Migration
 
 ```bash
-# Initialize database
+# Initialize migrations
+flask db init
+
+# Create initial migration
+flask db migrate -m "Initial migration"
+
+# Apply migrations
 flask db upgrade
 ```
+
+## Sample Data
+
+The application includes a sample data generator that creates realistic equipment and maintenance records. To populate the database with sample data:
+
+```bash
+# Run the sample data generator
+python add_sample_data.py
+```
+
+This will create:
+- 195+ equipment records across 7 categories
+- 380+ maintenance records
+- Realistic data including:
+  - Equipment details (name, category, serial number, etc.)
+  - Maintenance history
+  - Status distribution (70% operational, 20% maintenance, 10% out of service)
+  - Location assignments
+  - Maintenance schedules
+
+Sample data categories include:
+- IT Equipment
+- Fire Safety
+- Kitchen Equipment
+- Facilities
+- Medical Equipment
+- Household Items
+- Security Systems
 
 ## Web Server Configuration
 
