@@ -437,8 +437,7 @@ flask db upgrade
 
 For technical support or issues, please contact:
 - Email: mymails.abdul@gmail.com
-- Documentation: [Documentation Link]
-- Issue Tracker: [GitHub Issues]
+
 
 ## License
 
