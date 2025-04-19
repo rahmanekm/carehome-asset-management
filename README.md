@@ -16,6 +16,7 @@ A comprehensive web application for managing equipment and assets in UK-based ca
 - [Maintenance and Updates](#maintenance-and-updates)
 - [Troubleshooting](#troubleshooting)
 - [Support](#support)
+- [Production Deployment](#production-deployment)
 
 ## Features
 
@@ -389,4 +390,88 @@ For technical support or issues, please contact:
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details. 
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Production Deployment
+
+### 1. Server Setup
+
+```bash
+# Create application directory
+sudo mkdir -p /opt/carehome-asset-management
+sudo chown -R $USER:$USER /opt/carehome-asset-management
+
+# Clone the repository
+cd /opt/carehome-asset-management
+git clone https://github.com/rahmanekm/carehome-asset-management.git .
+
+# Create and activate virtual environment
+python3 -m venv venv
+source venv/bin/activate
+
+# Install the application
+pip install -e .
+```
+
+### 2. Environment Configuration
+
+```bash
+# Create .env file
+cp .env.example .env
+nano .env
+
+# Set FLASK_APP environment variable
+echo "export FLASK_APP=run.py" >> ~/.bashrc
+source ~/.bashrc
+```
+
+### 3. Database Setup
+
+```bash
+# Initialize migrations
+flask db init
+
+# Create initial migration
+flask db migrate -m "Initial migration"
+
+# Apply migrations
+flask db upgrade
+
+# Add sample data (optional)
+python add_sample_data.py
+```
+
+### 4. Gunicorn Setup
+
+```bash
+# Install Gunicorn
+pip install gunicorn
+
+# Create Gunicorn configuration
+sudo nano /etc/supervisor/conf.d/carehome.conf
+```
+
+Add the following configuration:
+```ini
+[program:carehome]
+command=/opt/carehome-asset-management/venv/bin/gunicorn -w 4 -b 127.0.0.1:8000 run:app
+directory=/opt/carehome-asset-management
+user=www-data
+autostart=true
+autorestart=true
+environment=FLASK_APP="run.py"
+stderr_logfile=/var/log/carehome.err.log
+stdout_logfile=/var/log/carehome.out.log
+```
+
+### 5. Start the Application
+
+```bash
+# Start Supervisor
+sudo supervisorctl reread
+sudo supervisorctl update
+sudo supervisorctl start carehome
+
+# Check status
+sudo supervisorctl status carehome
+``` 
