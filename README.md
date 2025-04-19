@@ -62,7 +62,7 @@ FLUSH PRIVILEGES;
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/carehome-asset-management.git
+git clone https://github.com/rahmanekm/carehome-asset-management
 cd carehome-asset-management
 
 # Create and activate virtual environment
