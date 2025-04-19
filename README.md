@@ -381,6 +381,58 @@ sudo supervisorctl restart carehome
    - Test Nginx configuration: `sudo nginx -t`
    - Check Nginx error logs: `sudo tail -f /var/log/nginx/error.log`
 
+### Database Migration Issues
+
+If you encounter errors during database migration, follow these steps:
+
+1. **Clean Up Existing Database**:
+```bash
+# Connect to MySQL
+mysql -u root -p
+
+# Drop and recreate the database
+DROP DATABASE carehome;
+CREATE DATABASE carehome CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+2. **Reset Migrations**:
+```bash
+# Remove existing migrations
+rm -rf migrations/
+
+# Initialize fresh migrations
+flask db init
+
+# Create and apply initial migration
+flask db migrate -m "Initial migration"
+flask db upgrade
+```
+
+3. **Common Errors and Solutions**:
+
+   a. "Directory migrations already exists and is not empty"
+   ```bash
+   rm -rf migrations/
+   flask db init
+   ```
+
+   b. "Table 'equipment' already exists"
+   ```bash
+   # Drop the database and recreate it
+   mysql -u root -p -e "DROP DATABASE carehome; CREATE DATABASE carehome;"
+   flask db upgrade
+   ```
+
+   c. "Target database is not up to date"
+   ```bash
+   # Reset the database and migrations
+   rm -rf migrations/
+   mysql -u root -p -e "DROP DATABASE carehome; CREATE DATABASE carehome;"
+   flask db init
+   flask db migrate -m "Initial migration"
+   flask db upgrade
+   ```
+
 ## Support
 
 For technical support or issues, please contact:
