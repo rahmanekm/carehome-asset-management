@@ -258,7 +258,7 @@ Common issues and solutions:
 ## Support
 
 For support, please contact:
-- Email: support@yourdomain.com
+- Email: mymails.abdul@gmail.com
 - Issue Tracker: GitHub Issues
 
 ## License
